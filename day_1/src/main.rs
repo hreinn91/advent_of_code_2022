@@ -19,7 +19,6 @@ fn get_elf_with_most_calories(file: &str) -> (usize, i32) {
         .enumerate()
         .for_each(|(index, raw_string)| {
             let carlories = get_calories_from_backpack(raw_string);
-            println!("calories: {} index: {}", carlories, index);
             if carlories > elf_with_most_calories.1 {
                 elf_with_most_calories = (index + 1, carlories)
             }
