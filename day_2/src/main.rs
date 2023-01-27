@@ -6,21 +6,61 @@ const ROCK: Play = Play(1);
 const PAPER: Play = Play(2);
 const SCISSOR: Play = Play(3);
 
-fn evaluate_strategy_guide(file: &str) -> i32 {
+fn evaluate_strategy_guide(file: &str, calc_function: impl Fn(&str) -> i32) -> i32 {
     return fs::read_to_string(file)
         .expect("Could not find input file")
         .lines()
         .map(|raw| -> i32  {
-            return parse_and_calculate_score_a(raw);
+            return calc_function(raw);
         })
         .sum();
 }
 
 fn parse_and_calculate_score_a(raw: &str) -> i32 {
     let play_split: Vec<&str> = raw.split(" ").collect();
-    let o_play = parse_A(play_split[0].chars().next().unwrap()).expect("FAILED TO GET OPPONENT");
-    let m_play = parse_A(play_split[1].chars().next().unwrap()).expect("FAILED TO GET MYPLAY");
+    let o_play = parse_a(play_split[0].chars().next().unwrap()).expect("FAILED TO GET OPPONENT");
+    let m_play = parse_a(play_split[1].chars().next().unwrap()).expect("FAILED TO GET MYPLAY");
     return calculate_score(o_play, m_play);
+}
+
+fn parse_and_calculate_score_b(raw: &str) -> i32 {
+    let play_split: Vec<&str> = raw.split(" ").collect();
+    let o_play = parse_a(play_split[0].chars().next().unwrap()).expect("FAILED TO GET OPPONENT");
+    let m_play = parse_b(&o_play, play_split[1].chars().next().unwrap()).expect("FAILED TO GET MYPLAY");
+    return calculate_score(o_play, m_play);
+}
+
+fn parse_b(o_play: &Play, unwrap: char) -> Result<Play, String> {
+    return match unwrap {
+        'X' => Ok(get_loss(o_play)),
+        'Y' => Ok(get_same(o_play)),
+        'Z' => Ok(get_win(o_play)),
+        _ => Err(format!("Failed to parse string: {}", unwrap)),
+    }
+}
+
+fn get_loss(play: &Play) -> Play{
+    return match play {
+        &ROCK => SCISSOR,
+        &PAPER => ROCK,
+        _ => PAPER
+    }
+}
+
+fn get_win(play: &Play) -> Play{
+    return match play {
+        &ROCK => PAPER,
+        &PAPER => SCISSOR,
+        _ => ROCK
+    }
+}
+
+fn get_same(play: &Play) -> Play{
+    return match play {
+        &ROCK => ROCK,
+        &PAPER => PAPER,
+        _ => SCISSOR
+    }
 }
 
 fn calculate_score(o: Play, m: Play) -> i32 {
@@ -36,7 +76,7 @@ fn calculate_score(o: Play, m: Play) -> i32 {
     return play_score + 6;
 }
 
-fn parse_A(raw: char) -> Result<Play, String> {
+fn parse_a(raw: char) -> Result<Play, String> {
     return match raw {
         'A' => Ok(ROCK),
         'B' => Ok(PAPER),
@@ -53,7 +93,7 @@ mod tests {
     use super::*;
     #[test]
     fn test_parsin_opponent() {
-        let result = parse_A('A').expect("Failed to parse");
+        let result = parse_a('A').expect("Failed to parse");
         assert_eq!(result, ROCK);
     }
     #[test]
@@ -67,20 +107,15 @@ mod tests {
     }
     #[test]
     fn test_evaluate_strategy_guide() {
-        let result = evaluate_strategy_guide("test_1.txt");
+        let result = evaluate_strategy_guide("test_1.txt", parse_and_calculate_score_a);
         assert_eq!(result, 15);
     }
 }
 
-fn get_score<F: Fn()>(f: F){
-    f()
-}
-
-fn pring_message(message: &str) {
-    print!("$s")
-}
-
 fn main() {
-    // let part_1_result = evaluate_strategy_guide("day_2/input.txt");
-    println!("Total score: {part_1_result} ");
+    let part_1_result = evaluate_strategy_guide("day_2/input.txt", parse_and_calculate_score_a);
+    println!("Total score 1: {part_1_result} ");
+    let part_2_result = evaluate_strategy_guide("day_2/input.txt", parse_and_calculate_score_b);
+    println!("Total score 2: {part_2_result} ");
+
 }
