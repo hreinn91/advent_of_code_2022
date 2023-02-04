@@ -1,9 +1,33 @@
 use std::assert_eq;
 use std::fs;
 
-fn calculate_sum_of_priorities(file_name: &str) -> i32 {
-    return fs::read_to_string(file_name)
+fn calculate_group_priorities_sum(file_name: &str) -> i32 {
+    let rucksacks: Vec<String> = fs::read_to_string(file_name)
         .expect("Could not find input file")
+        .lines()
+        .map(|s| String::from(s))
+        .collect();
+
+        let mut i = 0;
+        let mut sum = 0;
+        while i < rucksacks.len() {
+            sum = sum + get_group_badge_priority(&rucksacks[i], &rucksacks[i + 1], &rucksacks[i + 2]).expect("Badge not found");
+            i = i + 3;
+        }
+        return sum;
+}
+
+fn get_group_badge_priority(first: &String, second: &String , third: &String) -> Result<i32, ()> {
+    for item in first.chars(){
+        if second.contains(item) && third.contains(item) {
+            return Ok(get_priority_of_item(item));
+        }
+    }
+    return Err(());
+}
+
+fn calculate_priorities_sum(file_name: &str) -> i32 {
+    return fs::read_to_string(file_name).expect("Could not find input file")
         .lines()
         .map(get_priority_from_items)
         .sum();
@@ -36,5 +60,6 @@ fn get_priority_of_item(item: char) -> i32 {
 }
 
 fn main() {
-    println!("Sum: {:?}", calculate_sum_of_priorities("input.txt"));
+    println!("Part One Sum: {:?}", calculate_priorities_sum("input.txt"));
+    println!("Part Two Sum: {:?}", calculate_group_priorities_sum("input.txt"));
 }
