@@ -60,6 +60,6 @@ fn get_priority_of_item(item: char) -> i32 {
 }
 
 fn main() {
-    println!("Part One Sum: {:?}", calculate_priorities_sum("input.txt"));
-    println!("Part Two Sum: {:?}", calculate_group_priorities_sum("input.txt"));
+    println!("Part One Sum: {:?}", calculate_priorities_sum("day_3/input.txt"));
+    println!("Part Two Sum: {:?}", calculate_group_priorities_sum("day_3/input.txt"));
 }

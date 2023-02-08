@@ -2,3 +2,5 @@
 .vscode/
 */target/
 */*/target/
+/.idea/
+*.iml
